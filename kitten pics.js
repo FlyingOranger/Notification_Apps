@@ -16,10 +16,10 @@ module.exports = function( data , helper){
 
     What you see is a regular JSON response from Reddit
 
-* In order to make coding a little easier, RedditCanFly only passes the most important information to this function
+* In order to make coding a little easier, Flying Oranger only passes the most important information to this function
     by advancing to the JSON response's data.children field, and each child advanced to the child.data field
 
-    Long story short, this means that data is an array of reddit posts.
+    Long story short, this means that `data` is an array of reddit posts.
 
 * So if you accessed the first post, at say data[0], it would look like this:
 {
