@@ -6,7 +6,6 @@
    have seen already.
    
 */
-module.exports = function( data , helper){
 
 /* If you're not familiar with the Reddit API and JSON, do these following steps:
 
@@ -34,6 +33,9 @@ module.exports = function( data , helper){
 
 * Also to make coding easier, this function is provided with a helper object
 
+    helper.first 
+        - Boolean that refers to if this is the first time that this notification app has been called.
+        
     helper.set( dataName, dataToSave )
         - Saves dataToSave inbetween requests, with the specified dataName
 
@@ -52,42 +54,72 @@ module.exports = function( data , helper){
                     then the banner is flown but not added to the tray (avoid duplicates)
 */   
  
+module.exports = {
     
-    // Always check to see if there are any posts
-    if ( data.length > 0){
-        
-        // get the last posts we have found
-        var lastPosts = helper.get('last-posts');
-        
-        // if this is the first time, and we haven't found any posts, set it to an empty array
-        if (lastPosts == null)
-            lastPosts = [];
-            
-        // go through all the posts
-        for (var post of data){
-            
-            if (post.score >= 200){
-                
-                // Is this post's ID in last 4 posts?
-                if (lastPosts.indexOf(post.id) < 0){
+    path : "/r/aww/search",
+    
+    queries : {       
+        "q": "kitten",
+        "sort": "new",
+        "restrict_sr": "on",
+        "t": "all"
+    },
+    
+    settings: {
+        Puppy: false,
+        "Run on start": false
+    },
 
-                    // it is, so add it to the beginning of our array 
-                    lastPosts.unshift(post.id);
-                    lastPosts.length = 4; // and by making the length 4, we chop off any remaining items
+    interval: 30,
 
-                    // save lastPosts for next time
-                    helper.set('last-posts', lastPosts);
-                    
-                    // notify the user that there is a new kitten post over 50!
-                    helper.notify("New Kitten!", post.url);
+    cb: function(data, helper){
+        
+        // change our search to puppies
+        if (helper.settings.puppy)
+            module.exports.queries.q = "puppy";
+        else
+            module.exports.queries.q = "kitten";
+        
+        // Always check to see if there are any posts
+        if ( data.length > 0){
+
+            // get the last posts we have found
+            var lastPosts = helper.get('last-posts');
+
+            // if this is the first time, and we haven't found any posts, set it to an empty array
+            if (lastPosts == null)
+                lastPosts = [];
+
+            // go through all the posts
+            for (var post of data){
+
+                if (post.score >= 200){
+
+                    // Is this post's ID in last 4 posts?
+                    if (lastPosts.indexOf(post.id) < 0){
+
+                        // it is, so add it to the beginning of our array 
+                        lastPosts.unshift(post.id);
+                        lastPosts.length = 4; // and by making the length 4, we chop off any remaining items
+
+                        // save lastPosts for next time
+                        helper.set('last-posts', lastPosts);
+
+                        // notify the user that there is a new kitten/puppy post over 50!
+                        // but only if this isn't the first time this app is run,
+                        // depending on the user's preference
+                        // this avoids a bunch of notifications on startup
+                        if (!post.first || helper.settings["run on start"])
+                            helper.notify( helper.settings.puppy ? "New Puppy!": "New Kitten!", post.url);
+                    }
+
+                    // make sure to exit, or else we'll call helper.more by accident
+                    return;
                 }
-                
-                // make sure to exit, or else we'll call helper.more by accident
-                return;
             }
+
+            // we went through all the posts but didn't find any over 50... get some more posts
+            helper.more();
         }
-        
-        // we went through all the posts but didn't find any over 50... get some more posts
-        helper.more();
     }
-}
+};
