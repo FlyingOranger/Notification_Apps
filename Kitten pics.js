@@ -66,14 +66,12 @@ module.exports = {
     },
     
     settings: {
-        Puppy: false,
-        "Run on start": false
+        Puppy: false
     },
 
-    interval: 5,
+    interval: 10,
 
     cb: function(data, helper){
-        
         
         // change our search to puppies
         if (helper.settings.Puppy)
@@ -110,7 +108,7 @@ module.exports = {
                         // but only if this isn't the first time this app is run,
                         // depending on the user's preference
                         // this avoids a bunch of notifications on startup
-                        if (!post.first || helper.settings["run on start"])
+                        if (!helper.first)
                             helper.notify( helper.settings.Puppy ? "New Puppy!": "New Kitten!", post.url);
                     }
 
