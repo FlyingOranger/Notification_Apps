@@ -70,12 +70,13 @@ module.exports = {
         "Run on start": false
     },
 
-    interval: 30,
+    interval: 5,
 
     cb: function(data, helper){
         
+        
         // change our search to puppies
-        if (helper.settings.puppy)
+        if (helper.settings.Puppy)
             module.exports.queries.q = "puppy";
         else
             module.exports.queries.q = "kitten";
@@ -110,7 +111,7 @@ module.exports = {
                         // depending on the user's preference
                         // this avoids a bunch of notifications on startup
                         if (!post.first || helper.settings["run on start"])
-                            helper.notify( helper.settings.puppy ? "New Puppy!": "New Kitten!", post.url);
+                            helper.notify( helper.settings.Puppy ? "New Puppy!": "New Kitten!", post.url);
                     }
 
                     // make sure to exit, or else we'll call helper.more by accident
