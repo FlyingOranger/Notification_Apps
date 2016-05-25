@@ -1,5 +1,5 @@
 /* This Crawler checks to see if there are any new posts on r/aww, 
-   with "kitten" in their title, and with a score of at least 50
+   with "kitten" in their title, and with a score of at least 200
    
    We save the last 4 posts we've found, because if some posts are really close in score,
    they can overtake eachother and you'll have lots of notifications of something you might 
@@ -19,7 +19,8 @@ module.exports = {
     },
     
     settings: {
-        Puppy: false
+        Puppy: false,
+        "Disable flying notifications": true
     },
 
     interval: 60,
@@ -61,9 +62,8 @@ module.exports = {
                         // save lastPosts for next time
                         helper.set('last-posts', lastPosts);
 
-                        // notify the user that there is a new kitten/puppy post over 50!
-                        // if it's the first time, don't fly a banner because it's slightly annoying
-                        helper.notify( helper.settings.Puppy ? "New Puppy!": "New Kitten!", post.url, !helper.first);
+                        // notify the user that there is a new kitten/puppy post over 200!
+                        helper.notify( helper.settings.Puppy ? "New Puppy!": "New Kitten!", post.url, true);
                     }
 
                     // make sure to exit, or else we'll call helper.more by accident
@@ -71,7 +71,7 @@ module.exports = {
                 }
             }
 
-            // we went through all the posts but didn't find any over 50... get some more posts
+            // we went through all the posts but didn't find any over 200... get some more posts
             helper.more();
         }
     }
